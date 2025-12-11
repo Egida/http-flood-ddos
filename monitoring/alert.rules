@@ -4,7 +4,7 @@ groups:
 
   # Traffic tăng đột biến (Nginx)
   - alert: PossibleDDoS
-    expr: rate(nginx_http_requests[30s]) > 200
+    expr: rate(nginx_http_requests_total[30s]) > 200
     for: 10s
     labels:
       severity: warning
@@ -29,9 +29,9 @@ groups:
     annotations:
       description: "⚠️ CPU Nginx Proxy cao → khả năng có traffic bất thường"
 
-  # Xác nhận DDoS
+  # Xác nhận DDoS (2 điều kiện)
   - alert: ConfirmedDDoS
-    expr: (rate(nginx_http_requests[30s]) > 200)
+    expr: (rate(nginx_http_requests_total[30s]) > 200)
           and (rate(container_cpu_usage_seconds_total{name="be"}[30s]) * 100 > 70)
     for: 10s
     labels:
