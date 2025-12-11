@@ -3,7 +3,7 @@ groups:
     rules:
       - alert: PossibleDDoS
         expr: rate(nginx_http_requests_total[10s]) > 50
-        for: 5s
+        for: 0s
         labels:
           severity: "critical"
         annotations:
@@ -11,7 +11,7 @@ groups:
       
       - alert: HighCPUServer
         expr: (1 - avg by (instance)(rate(node_cpu_seconds_total{mode="idle"}[15s]))) > 0.40
-        for: 5s
+        for: 0s
         labels:
           severity: "warning"
         annotations:
@@ -19,7 +19,7 @@ groups:
       
       - alert: ConfirmedDDoS
         expr: (rate(nginx_http_requests_total[10s]) > 50) and ((1 - avg by (instance)(rate(node_cpu_seconds_total{mode="idle"}[15s]))) > 0.40)
-        for: 5s
+        for: 0s
         labels:
           severity: "critical"
         annotations:
