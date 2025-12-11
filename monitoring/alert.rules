@@ -1,0 +1,31 @@
+groups:
+- name: ddos_alert_group
+  rules:
+
+  # Traffic đột biến
+  - alert: PossibleDDoS
+    expr: rate(nginx_http_requests_total[30s]) > 300
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      description: "🚨 Traffic tăng đột biến → nghi ngờ DDoS HTTP Flood"
+
+  # CPU server cao
+  - alert: HighCPUServer
+    expr: 1 - avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) by (instance) > 0.8
+    for: 20s
+    labels:
+      severity: warning
+    annotations:
+      description: "🔥 CPU server vượt 80% → khả năng bị tấn công"
+
+  # Xác nhận DDoS
+  - alert: ConfirmedDDoS
+    expr: (rate(nginx_http_requests_total[30s]) > 300)
+          and (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) by (instance) > 0.8)
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      description: "🔥 XÁC NHẬN DDoS HTTP Flood: traffic spike + CPU cao"
