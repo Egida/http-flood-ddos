@@ -2,36 +2,39 @@ groups:
 - name: ddos_alert_group
   rules:
 
-  # =======================================
-  # 1) Traffic đột biến (HTTP Flood nghi ngờ)
-  # =======================================
+  # Traffic tăng đột biến (Nginx)
   - alert: PossibleDDoS
-    expr: rate(nginx_http_requests_total[30s]) > 300
+    expr: rate(nginx_http_requests[30s]) > 200
     for: 10s
-    labels:
-      severity: critical
-    annotations:
-      description: "🚨 Traffic tăng đột biến → nghi ngờ DDoS HTTP Flood"
-
-  # =======================================
-  # 2) CPU cao của container Backend (thay vì CPU host)
-  # =======================================
-  - alert: HighCPUServer
-    expr: rate(container_cpu_usage_seconds_total{container="be"}[30s]) > 0.7
-    for: 20s
     labels:
       severity: warning
     annotations:
-      description: "🔥 CPU Backend > 70% trong 20s → có thể bị tấn công"
+      description: "🚨 Traffic Nginx tăng mạnh → nghi ngờ HTTP Flood"
 
-  # =======================================
-  # 3) Xác nhận DDoS (Traffic + CPU)
-  # =======================================
-  - alert: ConfirmedDDoS
-    expr: (rate(nginx_http_requests_total[30s]) > 300)
-          and (rate(container_cpu_usage_seconds_total{container="be"}[30s]) > 0.7)
+  # CPU Backend cao
+  - alert: HighCPUBackend
+    expr: rate(container_cpu_usage_seconds_total{name="be"}[30s]) * 100 > 70
     for: 10s
     labels:
       severity: critical
     annotations:
-      description: "🔥 XÁC NHẬN DDoS HTTP Flood: Traffic spike + CPU Backend cao"
+      description: "🔥 CPU Backend vượt 70% → hệ thống có thể đang bị tấn công"
+
+  # CPU Nginx cao
+  - alert: HighCPUNginx
+    expr: rate(container_cpu_usage_seconds_total{name="nginx_proxy"}[30s]) * 100 > 70
+    for: 10s
+    labels:
+      severity: warning
+    annotations:
+      description: "⚠️ CPU Nginx Proxy cao → khả năng có traffic bất thường"
+
+  # Xác nhận DDoS
+  - alert: ConfirmedDDoS
+    expr: (rate(nginx_http_requests[30s]) > 200)
+          and (rate(container_cpu_usage_seconds_total{name="be"}[30s]) * 100 > 70)
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      description: "🔥 XÁC NHẬN DDoS: Traffic nginx cao + CPU backend cao"

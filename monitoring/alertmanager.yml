@@ -11,7 +11,9 @@ receivers:
         chat_id: "6163552209"
         parse_mode: "Markdown"
         message: |
-          🚨 *DDoS ALERT*
-          {{ .CommonAnnotations.description }}
-          Status: {{ .Status }}
-          Time: {{ .StartsAt }}
+          🚨 *DDoS ALERT DETECTED*
+          *Description:* {{ .CommonAnnotations.description }}
+          *Alert:* {{ .CommonLabels.alertname }}
+          *Severity:* {{ .CommonLabels.severity }}
+          *Status:* {{ .Status }}
+          *Time:* {{ .StartsAt }}
