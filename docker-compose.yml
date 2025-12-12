@@ -60,7 +60,7 @@ services:
   # CADVISOR (CPU DOCKER)
   # ===========================
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest  
+    image: zcube/cadvisor:latest  
     container_name: cadvisor
     ports:
       - "8081:8080"
